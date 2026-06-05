@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes, CommandHandler
 
 TOKEN = os.getenv("TOKEN")
-GEMINI_KEY = os.getenv("TOKEN_KE")
+GEMINI_KEY = os.getenv("GEMINI_KEY")
 
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
@@ -13,7 +13,7 @@ async def is_inappropriate(text):
     try:
         response = model.generate_content(
             f"هل هذا النص يحتوي على سباب أو محتوى مخل أو روابط إباحية؟ أجب بـ نعم أو لا فقط:\n{text}"
-        )
+)
         return "نعم" in response.text
     except:
         return False
