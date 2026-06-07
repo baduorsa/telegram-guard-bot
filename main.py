@@ -35,7 +35,12 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
    text = message.text.lower()
 
    contains_bad_word = any(word in text for word in BAD_WORDS)
-   contains_link = "http" in text or "www." in text or ".com" in text or "t.me" in text
+   BAD_LINKS = [
+       "onlyfans", "t.me/+", "telegram.me/+",
+       "xvideos", "xnxx", "pornhub", "bit.ly/",
+       "tinyurl", "adult", "xxx"
+   ]
+   contains_link = any(link in text for link in BAD_LINKS)
 
    if contains_bad_word or contains_link or await is_inappropriate(text):
        await message.delete()
