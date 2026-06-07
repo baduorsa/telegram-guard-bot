@@ -48,7 +48,8 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
    contains_bad_word = any(word in text for word in BAD_WORDS)
    contains_bad_link = any(link in text for link in BAD_LINKS) and not any(allowed in text for allowed in ALLOWED_LINKS)
 
-   if contains_bad_word or contains_bad_link or await is_inappropriate(text):
+   is_allowed = any(allowed in text for allowed in ALLOWED_LINKS)
+   if (contains_bad_word or contains_bad_link or await is_inappropriate(text)) and not is_allowed:
        await message.delete()
        await context.bot.ban_chat_member(chat_id, user.id)
        await context.bot.send_message(chat_id,
@@ -69,5 +70,5 @@ def main():
    print("✅ البوت يعمل...")
    app.run_polling()
 
-if __name__ == "_main_":
+if __name__ == "__main__":
    main()
