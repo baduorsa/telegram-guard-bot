@@ -16,6 +16,17 @@ BAD_WORDS = [
    "t.me/+", "telegram.me/+", "bit.ly", "tinyurl"
 ]
 
+BAD_LINKS = [
+   "onlyfans", "t.me/+", "telegram.me/+",
+   "xvideos", "xnxx", "pornhub", "bit.ly/",
+   "tinyurl", "adult", "xxx"
+]
+
+ALLOWED_LINKS = [
+   "youtube.com", "github.com", "google.com",
+   "drive.google.com", "docs.google.com", "wikipedia.org"
+]
+
 async def is_inappropriate(text):
    try:
        response = model.generate_content(
@@ -35,14 +46,9 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
    text = message.text.lower()
 
    contains_bad_word = any(word in text for word in BAD_WORDS)
-   BAD_LINKS = [
-       "onlyfans", "t.me/+", "telegram.me/+",
-       "xvideos", "xnxx", "pornhub", "bit.ly/",
-       "tinyurl", "adult", "xxx"
-   ]
-   contains_link = any(link in text for link in BAD_LINKS)
+   contains_bad_link = any(link in text for link in BAD_LINKS) and not any(allowed in text for allowed in ALLOWED_LINKS)
 
-   if contains_bad_word or contains_link or await is_inappropriate(text):
+   if contains_bad_word or contains_bad_link or await is_inappropriate(text):
        await message.delete()
        await context.bot.ban_chat_member(chat_id, user.id)
        await context.bot.send_message(chat_id,
@@ -63,5 +69,5 @@ def main():
    print("✅ البوت يعمل...")
    app.run_polling()
 
-if __name__ == "__main__":
+if __name__ == "_main_":
    main()
