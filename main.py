@@ -1,5 +1,5 @@
 import os
-from telegram import Update, ChatPermissions
+from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes, CommandHandler
 
 TOKEN = os.getenv("TOKEN")
@@ -7,26 +7,10 @@ TOKEN = os.getenv("TOKEN")
 BAD_WORDS = [
    "زق", "كلب", "حمار", "يلعن", "تبا", "بعير",
    "sex", "porn", "xxx", "18+", "+18", "onlyfans",
-   "سكس", "بورن", "نيك", "شرموطة", "قحبة", "عاهرة"
+   "سكس", "بورن", "نيك", "شرموطة", "قحبة", "عاهرة",
+   "t.me/+", "xvideos", "xnxx", "pornhub"
 ]
 
-BAD_LINKS = [
-   "onlyfans", "xvideos", "xnxx", "pornhub",
-   "tinyurl", "adult", "xxx", "t.me/+"
-]
-
-ALLOWED_LINKS = [
-   "youtube.com", "github.com", "google.com",
-   "drive.google.com", "docs.google.com", "wikipedia.org",
-   "stackoverflow.com", "microsoft.com", "visualstudio.com",
-   "learn.microsoft.com", "w3schools.com", "sqlservertutorial.net",
-   "tutorialspoint.com", "geeksforgeeks.org", "leetcode.com",
-   "kaggle.com", "researchgate.net", "academia.edu",
-   "linkedin.com", "twitter.com", "notion.so",
-   "figma.com", "canva.com", "trello.com"
-]
-
-# تحذيرات الأعضاء
 warnings = {}
 
 async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -39,12 +23,7 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
    chat_id = message.chat_id
    text = message.text.lower()
 
-   is_allowed = any(allowed in text for allowed in ALLOWED_LINKS)
-   if is_allowed:
-       return
-
    contains_bad_word = any(word in text for word in BAD_WORDS)
-   contains_bad_link = any(link in text for link in BAD_LINKS)
 
    if contains_bad_word:
        warnings[user_id] = warnings.get(user_id, 0) + 1
@@ -63,13 +42,6 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                f"🚫 تم حظر {user.first_name}\n"
                f"السبب: تكرار استخدام ألفاظ مسيئة")
            del warnings[user_id]
-
-   elif contains_bad_link:
-       await message.delete()
-       await context.bot.ban_chat_member(chat_id, user_id)
-       await context.bot.send_message(chat_id,
-           f"🚫 تم حظر {user.first_name}\n"
-           f"السبب: إرسال رابط مشبوه")
 
 async def ban_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
    if not update.message.reply_to_message:
